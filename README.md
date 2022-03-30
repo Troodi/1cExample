@@ -26,8 +26,8 @@
 
 ## Api
 
- - /prices (с пагинацией)
- - /prices/{product_id}
+ - http://localhost:8989/api/prices (с пагинацией)
+ - http://localhost:8989/api/prices/{product_id}
 
 ```json
 {
