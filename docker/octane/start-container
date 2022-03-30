@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+php -e artisan octane:start --host=host.docker.internal --port=8989 --workers=4 --task-workers=8 --max-requests=1000 --watch
