@@ -35,7 +35,6 @@ class PriceSeeder extends Seeder
                     });
             }
             Price::insert($rowsToInsert);
-            $rowsToInsert = [];
         });
     }
 }
