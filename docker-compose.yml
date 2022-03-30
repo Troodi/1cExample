@@ -1,0 +1,71 @@
+version: '3'
+services:
+    nginx:
+        image: nginx:alpine
+        restart: unless-stopped
+        environment:
+            TZ: Europe/Moscow
+        hostname: host.docker.internal
+        volumes:
+            - .:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - .data/nginx/logs:/var/log/nginx
+        ports:
+            - "8979:80"
+            - "4439:443"
+        depends_on:
+            - octane
+        links:
+            - octane
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            1c:
+                aliases:
+                    - localhost:89
+    octane:
+        build: docker/octane
+        image: 1c-php
+        ports:
+            - '8989:8989'
+        working_dir: /var/www
+        volumes:
+            - .:/var/www
+            - ./docker/octane/php.ini:/usr/local/etc/php/php.ini
+        networks:
+            - 1c
+        depends_on:
+            - mysql
+            - redis
+    mysql:
+        image: 'mysql:8.0'
+        ports:
+            - '3378:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - 'mysql:/var/lib/mysql'
+        networks:
+            - 1c
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '6399:6379'
+        volumes:
+            - 'redis:/data'
+        networks:
+            - 1c
+
+networks:
+    1c:
+        driver: bridge
+volumes:
+    mysql:
+        driver: local
+    redis:
+        driver: local
